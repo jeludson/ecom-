@@ -8,9 +8,6 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "i.pravatar.cc" },
     ],
   },
-  turbopack: {
-    root: process.cwd(),
-  },
 };
 
 export default nextConfig;

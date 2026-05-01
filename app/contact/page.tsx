@@ -1,10 +1,15 @@
+"use client";
+
+"use client";
+
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Instagram, Youtube, Facebook, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Instagram, Youtube, Facebook, Twitter, Send } from "lucide-react";
 
 const socialLinks = [
   { name: "Facebook", icon: Facebook, link: "https://facebook.com/novacommerce", color: "hover:text-blue-500" },
   { name: "Instagram", icon: Instagram, link: "https://instagram.com/novacommerce", color: "hover:text-pink-500" },
   { name: "YouTube", icon: Youtube, link: "https://youtube.com/novacommerce", color: "hover:text-red-500" },
+  { name: "X", icon: Twitter, link: "https://x.com/novacommerce", color: "hover:text-white" },
   { name: "Gmail", icon: Mail, link: "mailto:contact@novacommerce.com", color: "hover:text-primary" },
 ];
 
