@@ -2,7 +2,6 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
@@ -51,6 +50,9 @@ providers.push(
       password: { label: "Password", type: "password" },
     },
     authorize: async (credentials: any) => {
+      if (!process.env.MONGODB_URL) {
+        return null;
+      }
       if (!credentials?.email || !credentials?.password) {
         return null;
       }
@@ -83,7 +85,9 @@ providers.push(
 );
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  // Temporary hardening for Vercel build/runtime stability:
+  // avoid adapter initialization during deployment until DB env/connection is fully stable.
+  adapter: undefined,
   secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   trustHost: true,
   providers,

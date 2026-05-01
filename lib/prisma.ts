@@ -3,17 +3,30 @@ import { PrismaClient } from "@prisma/client";
 const dbUrl = process.env.MONGODB_URL;
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-const prismaClient =
-  dbUrl
-    ? globalForPrisma.prisma ||
+const createUnavailablePrisma = (message: string) =>
+  new Proxy({} as PrismaClient, {
+    get() {
+      throw new Error(message);
+    },
+  }) as PrismaClient;
+
+let prismaClient: PrismaClient;
+
+if (!dbUrl) {
+  prismaClient = createUnavailablePrisma("MONGODB_URL is not defined");
+} else {
+  try {
+    prismaClient =
+      globalForPrisma.prisma ||
       new PrismaClient({
         log: ["query"],
-      })
-    : (new Proxy({} as PrismaClient, {
-        get() {
-          throw new Error("MONGODB_URL is not defined");
-        },
-      }) as PrismaClient);
+      });
+  } catch (error: any) {
+    prismaClient = createUnavailablePrisma(
+      `Failed to initialize Prisma client: ${error?.message || "Unknown error"}`
+    );
+  }
+}
 
 export const prisma = prismaClient;
 
