@@ -1,33 +1,38 @@
 import { PrismaClient } from "@prisma/client";
 
-const dbUrl = process.env.MONGODB_URL;
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-const createUnavailablePrisma = (message: string) =>
-  new Proxy({} as PrismaClient, {
-    get() {
-      throw new Error(message);
-    },
-  }) as PrismaClient;
-
-let prismaClient: PrismaClient;
-
-if (!dbUrl) {
-  prismaClient = createUnavailablePrisma("MONGODB_URL is not defined");
-} else {
-  try {
-    prismaClient =
-      globalForPrisma.prisma ||
-      new PrismaClient({
-        log: ["query"],
-      });
-  } catch (error: any) {
-    prismaClient = createUnavailablePrisma(
-      `Failed to initialize Prisma client: ${error?.message || "Unknown error"}`
-    );
+function createClient(): PrismaClient {
+  const dbUrl = process.env.MONGODB_URL;
+  if (!dbUrl) {
+    throw new Error("MONGODB_URL is not defined");
   }
+  return new PrismaClient({
+    log:
+      process.env.NODE_ENV === "development"
+        ? (["warn", "error"] as const)
+        : (["error"] as const),
+  });
 }
 
-export const prisma = prismaClient;
+function getClient(): PrismaClient {
+  if (globalForPrisma.prisma) return globalForPrisma.prisma;
+  const client = createClient();
+  globalForPrisma.prisma = client;
+  return client;
+}
 
-if (dbUrl && process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+/**
+ * Lazy proxy so importing this module during `next build` does not construct PrismaClient
+ * (avoids engine/env edge cases while Next collects route data).
+ */
+export const prisma = new Proxy({} as PrismaClient, {
+  get(_target, prop, receiver) {
+    const client = getClient();
+    const value = Reflect.get(client, prop, receiver);
+    if (typeof value === "function") {
+      return value.bind(client);
+    }
+    return value;
+  },
+}) as PrismaClient;
