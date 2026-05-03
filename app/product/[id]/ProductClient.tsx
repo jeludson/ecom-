@@ -118,7 +118,7 @@ export default function ProductClient({ id }: { id: string }) {
               </div>
               <button 
                 onClick={() => {
-                  for(let i=0; i<quantity; i++) addToCart(product);
+                  addToCart(product, quantity);
                 }}
                 className="flex-grow bg-primary/10 border border-primary text-primary font-black py-4 rounded-full flex items-center justify-center space-x-3 transition-all duration-300 hover:bg-primary hover:text-white"
               >
@@ -129,7 +129,7 @@ export default function ProductClient({ id }: { id: string }) {
 
             <button 
               onClick={() => {
-                addToCart(product);
+                addToCart(product, quantity);
                 router.push("/cart");
               }}
               className="w-full bg-secondary hover:bg-secondary/80 text-white font-black py-5 rounded-full flex items-center justify-center space-x-3 transition-all duration-300 hover:scale-[1.02] mb-12"

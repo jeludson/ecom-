@@ -66,7 +66,16 @@ export default function FeaturedProducts() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="min-w-[300px] md:min-w-[350px] group"
+              className="min-w-[300px] md:min-w-[350px] group cursor-pointer"
+              role="button"
+              tabIndex={0}
+              onClick={() => router.push(`/product/${product.id}`)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  router.push(`/product/${product.id}`);
+                }
+              }}
             >
               <div className="relative aspect-[4/5] glassmorphism rounded-3xl overflow-hidden mb-6 group">
                 <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -78,22 +87,35 @@ export default function FeaturedProducts() {
                 
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center space-x-3 translate-y-20 group-hover:translate-y-0 transition-transform duration-500">
                   <button 
-                    onClick={() => addToCart(product)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addToCart(product);
+                    }}
                     className="w-12 h-12 glassmorphism rounded-full flex items-center justify-center hover:bg-primary transition-colors tooltip"
                     title="Add to Cart"
                   >
                     <ShoppingCart size={20} />
                   </button>
                   <button 
-                    onClick={() => handleBuyNow(product)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleBuyNow(product);
+                    }}
                     className="w-12 h-12 glassmorphism rounded-full flex items-center justify-center hover:bg-secondary transition-colors"
                     title="Buy Now"
                   >
                     <Zap size={20} />
                   </button>
-                  <Link href={`/product/${product.id}`} className="w-12 h-12 glassmorphism rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/product/${product.id}`);
+                    }}
+                    className="w-12 h-12 glassmorphism rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
+                    title="View Details"
+                  >
                     <Eye size={20} />
-                  </Link>
+                  </button>
                 </div>
               </div>
 

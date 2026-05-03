@@ -120,7 +120,16 @@ function ShopContent() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: (index % 4) * 0.1 }}
               viewport={{ once: true }}
-              className="group"
+              className="group cursor-pointer"
+              role="button"
+              tabIndex={0}
+              onClick={() => router.push(`/product/${product.id}`)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  router.push(`/product/${product.id}`);
+                }
+              }}
             >
               <div className="relative aspect-[4/5] glassmorphism rounded-[2.5rem] overflow-hidden mb-6 group">
                 <img
@@ -131,26 +140,35 @@ function ShopContent() {
                 
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center space-x-4">
                   <button 
-                    onClick={() => addToCart(product)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addToCart(product);
+                    }}
                     className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform"
                     title="Add to Cart"
                   >
                     <ShoppingCart size={20} />
                   </button>
                   <button 
-                    onClick={() => handleBuyNow(product)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleBuyNow(product);
+                    }}
                     className="w-12 h-12 bg-secondary text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform"
                     title="Buy Now"
                   >
                     <Zap size={20} />
                   </button>
-                  <Link 
-                    href={`/product/${product.id}`}
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/product/${product.id}`);
+                    }}
                     className="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 transition-transform"
                     title="View Details"
                   >
                     <Eye size={20} />
-                  </Link>
+                  </button>
                 </div>
               </div>
 
